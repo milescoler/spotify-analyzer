@@ -18,7 +18,7 @@ Spotify Playlist Analyzer is a Streamlit web application that provides deep insi
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/spotify-playlist-analyzer.git
+git clone https://github.com/milescoler/spotify-analyzer.git
 cd spotify-playlist-analyzer
 ```
 
@@ -54,14 +54,8 @@ streamlit run app.py
 2. Click "Analyze" to view insights
 3. Use the "Use Example Playlist" button to try a sample playlist
 
-## Screenshots
-[You can add screenshots here once you have them]
-
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-This project is licensed under the MIT License.
 
 ## Disclaimer
 This project is not affiliated with Spotify. It uses the Spotify Web API but is not endorsed by Spotify.
