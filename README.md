@@ -1,4 +1,4 @@
-# 🎵 Spotify Playlist Analyzer
+# Spotify Playlist Analyzer
 
 ## Overview
 Spotify Playlist Analyzer is a Streamlit web application that provides deep insights into Spotify playlists. Analyze track popularity, top artists, and download playlist data with ease.

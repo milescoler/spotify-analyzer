@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -18,14 +18,23 @@ def get_spotify_client():
     Create a Spotify client with full authorization using Streamlit secrets
     """
     try:
-        # Retrieve credentials from Streamlit secrets
-        client_id = st.secrets["SPOTIFY_CLIENT_ID"]
-        client_secret = st.secrets["SPOTIFY_CLIENT_SECRET"]
+        # Use Streamlit secrets
+        client_id = st.secrets["SPOTIPY_CLIENT_ID"]
+        client_secret = st.secrets["SPOTIPY_CLIENT_SECRET"]
+        redirect_uri = st.secrets["SPOTIPY_REDIRECT_URI"]
+
+        # Configure Spotipy client
+        client_credentials_manager = SpotifyClientCredentials(
+            client_id=client_id, 
+            client_secret=client_secret
+        )
+
+        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
         
         return spotipy.Spotify(auth_manager=SpotifyOAuth(
             client_id=client_id,
             client_secret=client_secret,
-            redirect_uri='https://spotify-playlist-analyzer.streamlit.app/callback',
+            redirect_uri=redirect_uri,
             scope='playlist-read-private playlist-read-collaborative user-library-read'
         ))
     except KeyError:
