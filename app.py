@@ -55,23 +55,60 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def get_spotify_client():
-    """Create a simple Spotify client using Streamlit secrets"""
+    """Create a Spotify client using Streamlit secrets or environment variables"""
     try:
-        # Use Streamlit secrets
-        client_id = st.secrets["SPOTIPY_CLIENT_ID"]
-        client_secret = st.secrets["SPOTIPY_CLIENT_SECRET"]
-        redirect_uri = st.secrets["SPOTIPY_REDIRECT_URI"]
+        # Try using Streamlit secrets first
+        try:
+            client_id = st.secrets["SPOTIPY_CLIENT_ID"]
+            client_secret = st.secrets["SPOTIPY_CLIENT_SECRET"]
+            redirect_uri = st.secrets["SPOTIPY_REDIRECT_URI"]
+        except Exception:
+            # Fall back to direct input if secrets aren't available
+            st.info("Spotify API credentials needed. Please provide them below:")
+            client_id = st.text_input("Spotify Client ID", type="password")
+            client_secret = st.text_input("Spotify Client Secret", type="password")
+            redirect_uri = st.text_input("Redirect URI", "http://localhost:8501")
+            
+            # If any are empty, stop and wait for user input
+            if not (client_id and client_secret and redirect_uri):
+                st.warning("Please provide all Spotify API credentials to continue")
+                return None
 
+        # Show debug information (remove in production)
+        st.write(f"Connecting with redirect URI: {redirect_uri}")
+        
         # Configure Spotipy client
-        return spotipy.Spotify(auth_manager=SpotifyOAuth(
+        auth_manager = SpotifyOAuth(
             client_id=client_id,
             client_secret=client_secret,
             redirect_uri=redirect_uri,
-            scope='playlist-read-private playlist-read-collaborative'
-        ))
+            scope='playlist-read-private playlist-read-collaborative',
+            cache_path=".spotify_cache"  # Adding cache path for easier debugging
+        )
+        
+        # Check if auth manager is working
+        try:
+            token_info = auth_manager.get_cached_token()
+            if not token_info or auth_manager.is_token_expired(token_info):
+                st.write("Need to get new token...")
+                # Get a user to authorize if needed
+                auth_url = auth_manager.get_authorize_url()
+                st.markdown(f"Please click this link to authorize: [Spotify Authorization]({auth_url})")
+                redirect_code = st.text_input("Enter the redirect code from the URL:")
+                if redirect_code:
+                    auth_manager.get_access_token(redirect_code)
+                else:
+                    return None
+        except Exception as e:
+            st.error(f"Authentication error: {e}")
+            return None
+            
+        return spotipy.Spotify(auth_manager=auth_manager)
+        
     except Exception as e:
         st.error(f"Couldn't connect to Spotify: {e}")
-        st.info("Tip: You need to set up your Spotify API keys in the secrets.toml file")
+        st.info("Tip: Make sure your Spotify app in the developer dashboard has the correct redirect URI")
+        st.info("Correct format for redirect URI: http://localhost:8501")
     return None
 
 def get_playlist_tracks(sp, playlist_id):
