@@ -73,9 +73,6 @@ def get_spotify_client():
             if not (client_id and client_secret and redirect_uri):
                 st.warning("Please provide all Spotify API credentials to continue")
                 return None
-
-        # Show debug information (remove in production)
-        st.write(f"Connecting with redirect URI: {redirect_uri}")
         
         # Configure Spotipy client
         auth_manager = SpotifyOAuth(
