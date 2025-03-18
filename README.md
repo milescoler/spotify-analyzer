@@ -1,7 +1,7 @@
-# Spotify Playlist Analyzer
+# Spotify Playlist Analysis Tool
 
 ## Overview
-Spotify Playlist Analyzer is a powerful Streamlit application that provides comprehensive insights into your Spotify playlists. The application visualizes track popularity, artist distribution, and playlist metrics in an elegant, interactive interface.
+A charming name, I know. This tool is a powerful Streamlit application that provides comprehensive insights into your Spotify playlists. The application visualizes track popularity, artist distribution, and playlist metrics in an elegant, interactive interface.
 
 ## Features
 - Authenticate securely with your Spotify account
