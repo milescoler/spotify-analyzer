@@ -125,15 +125,26 @@ def create_track_dataframe(tracks):
     """Create a simple dataframe of track info"""
     data = []
     for item in tracks:
-        track = item['track']
-        if track:
-            data.append({
-                'Track Name': track['name'],
-                'Artist': track['artists'][0]['name'],
-                'Album': track['album']['name'],
-                'Popularity': track.get('popularity', 0)
-            })
-    
+        track = item.get('track')
+        if not track:
+            continue
+
+        # Some playlist entries (like local files) may not include complete
+        # metadata. Safely extract values and fall back to sensible defaults
+        # to avoid KeyError/IndexError crashes during analysis.
+        artists = track.get('artists') or []
+        artist_name = artists[0]['name'] if artists else 'Unknown Artist'
+
+        album = track.get('album') or {}
+        album_name = album.get('name', 'Unknown Album')
+
+        data.append({
+            'Track Name': track.get('name', 'Unknown Track'),
+            'Artist': artist_name,
+            'Album': album_name,
+            'Popularity': track.get('popularity', 0)
+        })
+
     return pd.DataFrame(data)
 
 def main():
