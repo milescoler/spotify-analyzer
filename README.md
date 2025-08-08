@@ -8,7 +8,9 @@ A charming name, I know. This tool is a powerful Streamlit application that prov
 - Analyze any accessible Spotify playlist (public, private, or collaborative)
 - Visualize popularity distribution across tracks
 - Identify top artists and their representation
-- View detailed track information including album and popularity scores
+- Explore audio features like danceability, energy, valence and tempo
+- View detailed track information including album, duration and popularity scores
+- Highlight top tracks by popularity and overall playlist duration
 - Export complete playlist data as CSV for further analysis
 - Clean, responsive interface optimized for desktop and mobile
 

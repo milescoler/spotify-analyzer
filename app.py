@@ -121,25 +121,44 @@ def get_playlist_tracks(sp, playlist_id):
     
     return tracks
 
-def create_track_dataframe(tracks):
-    """Create a simple dataframe of track info"""
+def create_track_dataframe(sp, tracks):
+    """Create a dataframe of track info and audio features"""
     data = []
+    track_ids = []
     for item in tracks:
-        track = item['track']
-        if track:
+        track = item.get('track')
+        if track and track.get('id'):
+            track_ids.append(track['id'])
             data.append({
+                'Track ID': track['id'],
                 'Track Name': track['name'],
                 'Artist': track['artists'][0]['name'],
                 'Album': track['album']['name'],
-                'Popularity': track.get('popularity', 0)
+                'Popularity': track.get('popularity', 0),
+                'Duration (min)': track['duration_ms'] / 60000
             })
-    
-    return pd.DataFrame(data)
+
+    df = pd.DataFrame(data)
+    if df.empty:
+        return df
+
+    # Fetch audio features for all tracks
+    features = []
+    for i in range(0, len(track_ids), 50):
+        batch = track_ids[i:i + 50]
+        features.extend(sp.audio_features(batch))
+
+    features_df = pd.DataFrame(features)
+    features_df = features_df[['id', 'danceability', 'energy', 'valence', 'tempo']]
+    features_df.rename(columns={'id': 'Track ID'}, inplace=True)
+
+    df = df.merge(features_df, on='Track ID', how='left')
+    return df
 
 def main():
     # Simple title
     st.title("My Spotify Playlist Analyzer")
-    st.markdown("*A simple tool to analyze your playlists*")
+    st.markdown("*An enhanced tool to analyze your playlists*")
     
     # Get Spotify client
     sp = get_spotify_client()
@@ -185,25 +204,36 @@ def main():
                 
                 # Get tracks
                 tracks = get_playlist_tracks(sp, playlist_id)
-                df = create_track_dataframe(tracks)
+                df = create_track_dataframe(sp, tracks)
                 
-                # Display simple stats
+                # Display detailed stats
                 st.markdown("### Playlist Stats")
-                col1, col2 = st.columns(2)
+                col1, col2, col3 = st.columns(3)
                 with col1:
-                    st.metric("Average Popularity", f"{df['Popularity'].mean():.1f}")
+                    st.metric("Avg Popularity", f"{df['Popularity'].mean():.1f}")
                 with col2:
-                    st.metric("Number of Artists", f"{df['Artist'].nunique()}")
+                    st.metric("Unique Artists", f"{df['Artist'].nunique()}")
+                with col3:
+                    total_duration = df['Duration (min)'].sum()
+                    st.metric("Total Duration (hrs)", f"{total_duration / 60:.2f}")
                 
-                # Create simple plots
+                # Visualizations
                 st.markdown("### Popularity Distribution")
                 fig, ax = plt.subplots(figsize=(8, 4))
                 sns.histplot(data=df, x='Popularity', kde=True, color='#1DB954', ax=ax)
                 ax.set_xlabel('Popularity Score (0-100)')
                 ax.set_ylabel('Number of Tracks')
                 st.pyplot(fig)
-                
-                # Show top artists
+
+                st.markdown("### Audio Feature Averages")
+                feature_cols = ['danceability', 'energy', 'valence', 'tempo']
+                feature_means = df[feature_cols].mean()
+                fig, ax = plt.subplots(figsize=(8, 4))
+                feature_means.plot.bar(ax=ax, color='#1DB954')
+                ax.set_ylabel('Average Value')
+                plt.xticks(rotation=0)
+                st.pyplot(fig)
+
                 st.markdown("### Top Artists")
                 top_artists = df['Artist'].value_counts().head(5)
                 fig, ax = plt.subplots(figsize=(8, 4))
@@ -211,10 +241,14 @@ def main():
                 ax.set_ylabel('Number of Tracks')
                 plt.xticks(rotation=45, ha='right')
                 st.pyplot(fig)
+
+                st.markdown("### Top Tracks by Popularity")
+                top_tracks = df.sort_values('Popularity', ascending=False).head(10)
+                st.dataframe(top_tracks[['Track Name', 'Artist', 'Popularity']])
                 
                 # Show track list
                 st.markdown("### Tracks")
-                st.dataframe(df)
+                st.dataframe(df.drop(columns=['Track ID']))
                 
                 # Download option
                 csv = df.to_csv(index=False)
@@ -238,3 +272,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
