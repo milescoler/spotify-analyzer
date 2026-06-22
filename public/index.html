@@ -6,6 +6,16 @@
   <title>🌱 Word Garden</title>
   <link rel="stylesheet" href="/styles.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>" />
+  <!-- Three.js (3D garden) is loaded in the browser via this import map so the
+       repo stays dependency-free. Needs internet at runtime (Codespaces/phone
+       have it); the garden degrades to a message if it can't load. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
 </head>
 <body>
   <div id="app">

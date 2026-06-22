@@ -16,10 +16,12 @@ tree across every subject.
   better you know it, the more it grows (`seed → sprout → seedling → bud →
   bloom → flourishing`). Stop practicing and it gets thirsty, wilts, and
   eventually dies — water it by practicing again.
-- **Top-down isometric 3D world** rendered like a city builder: raised soil
-  tiles with depth and shadows, plants that sway when healthy and droop when
-  thirsty, and decorations placed around the land. Drag to pan, pinch/scroll to
-  zoom, tap a plant to inspect it.
+- **Walkable Roblox-style 3D world.** Your garden is a real 3D scene with a
+  blocky avatar character (styled from your avatar choices). Move with the
+  on-screen **joystick** (or WASD), and walk up to a plant to inspect it. Plants
+  are low-poly 3D models that grow with mastery, sway when healthy, droop when
+  thirsty, and topple over grey when they die. Visiting a classmate's garden
+  gives you a drag-to-orbit camera.
 - **Three ways to learn** the same deck: 🃏 flashcards, 📝 quizzes, and
   📖 fill-the-blank readings. A lightweight spaced-repetition model tracks
   mastery per word.
@@ -104,7 +106,11 @@ is a local JSON file).
 
 ## How it's built
 
-A deliberately **zero-dependency** stack so it runs anywhere with just Node:
+A deliberately lean stack: the **server and tooling have zero npm
+dependencies** (runs with just Node), and the only frontend library is
+**Three.js**, loaded in the browser from a CDN via an import map — so there's
+still no install or build step. (The 3D garden needs internet to fetch Three.js;
+everything else works offline.)
 
 ```
 server.js          Built-in http server: static files + JSON API
@@ -121,7 +127,7 @@ public/
     student.js     Garden home, learn, explore, avatar studio
     teacher.js     Analytics dashboard
     tasks.js       Flashcard / quiz / reading runners
-    garden.js      Isometric 3D city-builder garden (Canvas2D renderer)
+    garden.js      Walkable 3D garden world (Three.js via CDN import map)
     shared.js      Leaderboard
     util.js        DOM + API helpers
 test/model.test.js

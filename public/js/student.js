@@ -74,7 +74,7 @@ export function mountStudent(root, studentId, switchUser) {
     );
 
     const gardenBox = h('div', { style: { margin: '1rem 0' } });
-    renderGarden(gardenBox, g, { interactive: true, onPlotClick: (plant) => {
+    renderGarden(gardenBox, g, { interactive: true, avatar: s.avatar, onPlotClick: (plant) => {
       if (plant) openPlantCard(plant);
       else { toast('Practice a word in the Learn tab to plant it here 🌱'); go('learn'); }
     } });
