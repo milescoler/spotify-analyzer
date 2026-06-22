@@ -54,19 +54,49 @@ npm test           # runs the learning/garden logic assertions
 npm run reset      # reset demo data to its starting state
 ```
 
-### 📱 On your phone
+### 📱 Run it from only your iPhone (no computer)
 
-`localhost` won't work from a phone — that points at the phone itself. Instead:
+`localhost` from your phone's browser points at the phone itself, so it only
+works if the server is *also* running on the phone. Three ways to do this with
+nothing but an iPhone:
 
-- **Same Wi-Fi:** run `npm start` on a computer and open the **LAN URL the
-  server prints on startup** (e.g. `http://192.168.1.42:3000`) in your phone's
-  browser. The server binds to all interfaces, so no extra setup is needed —
-  just make sure the phone and computer are on the same network (and your
-  firewall allows port 3000).
-- **Anywhere / to share with a class:** deploy to any Node host. The app honors
-  `PORT` and binds `0.0.0.0`, so platforms like Render, Railway, or Fly.io work
-  out of the box (`npm start` as the start command). Note: the JSON-file store
-  is ephemeral on free tiers, so demo data resets on redeploy.
+**A. GitHub Codespaces — recommended (runs in Safari, free 60 hrs/mo)**
+1. In Safari, open this repo on `github.com` and switch to this branch.
+2. Tap the green **Code** button → **Codespaces** → **Create codespace**.
+3. Wait for the in-browser editor to load. In the **Terminal** panel, type:
+   `npm start`
+4. A notification pops up to open the forwarded port — tap it to launch Word
+   Garden in a new Safari tab. (Already signed into GitHub, so the private
+   forwarded URL just works; set the port to **Public** in the *Ports* tab only
+   if you want to share it.)
+
+**B. Replit (polished mobile app or Safari, free)**
+1. Get the Replit app or open `replit.com`. Create → **Import from GitHub** and
+   paste this repo's URL.
+2. Tap **Run**. The `.replit` config starts the server; the webview shows the
+   app and gives you a `https://…replit.dev` URL you can open in Safari.
+
+**C. iSH — fully offline, on the phone itself (no account, no internet host)**
+1. Install **iSH** from the App Store (a Linux shell that runs on iOS).
+2. In iSH, run:
+   ```sh
+   apk add nodejs git
+   git clone <this-repo-url> && cd spotify-analyzer
+   git checkout claude/word-garden-rebuild-xum9zg
+   npm start
+   ```
+3. Open **Safari** to `http://localhost:3000`. Because the server is running on
+   the phone, `localhost` reaches it. (Switch back to Safari quickly — iOS may
+   suspend iSH after a bit in the background.)
+
+> Also works the classic way: run `npm start` on a computer on the same Wi-Fi
+> and open the **LAN URL the server prints at startup** (e.g.
+> `http://192.168.1.42:3000`) from your phone.
+
+**To share with a class / use off Wi-Fi:** deploy to any Node host — the app
+honors `PORT` and binds `0.0.0.0`, so Render, Railway, or Fly.io work with
+`npm start` as the start command (demo data resets on redeploy since the store
+is a local JSON file).
 
 ## How it's built
 

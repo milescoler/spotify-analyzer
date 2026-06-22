@@ -1,0 +1,7 @@
+# Replit config so the "Run" button launches Word Garden and exposes it.
+run = "npm start"
+modules = ["nodejs-20"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
