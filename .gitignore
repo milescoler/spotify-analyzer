@@ -4,6 +4,9 @@ node_modules/
 # Runtime data — regenerated/seeded on first boot
 data/data.json
 
+# Secrets — never commit a real key (.env.example is the template)
+.env
+
 # Logs & OS files
 *.log
 .DS_Store

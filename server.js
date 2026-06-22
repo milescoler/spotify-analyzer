@@ -70,6 +70,11 @@ async function handleApi(method, segments, query, body) {
     case method === 'POST' && head === 'cheer':
       return api.cheer(body);
 
+    case method === 'POST' && head === 'subjects':
+      return api.createSubject(body);
+    case method === 'POST' && head === 'decks':
+      return api.createDeck(body); // async — handler awaits the returned promise
+
     case method === 'GET' && head === 'gardens':
       return api.gardensList();
     case method === 'GET' && head === 'leaderboard':
@@ -139,6 +144,22 @@ function lanUrls() {
   }
   return urls;
 }
+
+// Load a local .env (zero-dependency) so an ANTHROPIC_API_KEY / WORD_GARDEN_MODEL
+// dropped in a .env file is picked up without any extra tooling.
+function loadEnv() {
+  try {
+    const envPath = path.join(__dirname, '.env');
+    if (!fs.existsSync(envPath)) return;
+    for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
+      const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (m && process.env[m[1]] === undefined) {
+        process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+      }
+    }
+  } catch { /* ignore malformed .env */ }
+}
+loadEnv();
 
 db.load(); // seed on boot
 // Bind to 0.0.0.0 so the server is reachable from other devices on the network,

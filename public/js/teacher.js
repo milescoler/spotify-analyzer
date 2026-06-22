@@ -27,7 +27,10 @@ export function mountTeacher(root, teacherId, switchUser) {
     const page = h('div.page');
 
     page.append(
-      h('h2', `${d.teacher.name} · ${d.classes[0]?.name || 'Class'}`),
+      h('div.row', { style: { justifyContent: 'space-between', alignItems: 'center' } }, [
+        h('h2', { style: { margin: 0 } }, `${d.teacher.name} · ${d.classes[0]?.name || 'Class'}`),
+        h('button.btn.primary', { onclick: () => openAuthor(d) }, '➕ Add Words'),
+      ]),
       h('p.muted', 'Each student grows a Word Garden as they master vocabulary. This dashboard rolls up their skill trees across every subject.'),
     );
 
@@ -134,6 +137,63 @@ export function mountTeacher(root, teacherId, switchUser) {
 
   function tile(big, lbl) {
     return h('div.tile', [h('div.big', String(big)), h('div.lbl', lbl)]);
+  }
+
+  // ---- authoring: add a subject + vocab list (definitions optional) ----
+  function openAuthor(d) {
+    // Subject: pick an existing one or type a new name.
+    const subjSelect = h('select.author-input');
+    subjSelect.appendChild(h('option', { value: '' }, '➕ New subject…'));
+    (d.subjects || []).forEach((s) =>
+      subjSelect.appendChild(h('option', { value: s.id }, `${s.icon} ${s.name}`)));
+    const newSubjInput = h('input.author-input', { placeholder: 'New subject name (e.g. Science Words)' });
+    const deckInput = h('input.author-input', { placeholder: 'Word set name (e.g. Life Science)' });
+    const wordsArea = h('textarea.author-input', {
+      rows: 9,
+      placeholder: 'One word per line. Optional definition after a dash or colon:\n\nhabitat — the home of an animal\npredator: an animal that hunts others\nnocturnal\ncamouflage',
+    });
+    const toggleNew = () => { newSubjInput.style.display = subjSelect.value ? 'none' : ''; };
+    subjSelect.addEventListener('change', toggleNew);
+
+    const status = h('p.muted', { style: { fontSize: '.8rem' } },
+      'Definitions are optional. Leave a word with no definition and the AI will write one — or a labeled sample is stored until an API key is added.');
+
+    const save = h('button.btn.primary', { onclick: async () => {
+      const words = wordsArea.value.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+        const m = l.match(/^(.+?)\s*(?:—|–|:|\t|\s-\s)\s*(.+)$/);
+        return m ? { term: m[1].trim(), definition: m[2].trim() } : { term: l };
+      });
+      if (!words.length) { status.textContent = 'Please enter at least one word.'; return; }
+      save.disabled = true; save.textContent = 'Saving…';
+      try {
+        const body = subjSelect.value
+          ? { teacherId, subjectId: subjSelect.value, name: deckInput.value, words }
+          : { teacherId, subjectName: newSubjInput.value, name: deckInput.value, words };
+        const r = await api('decks', { body });
+        m.close();
+        render();
+        const note = r.aiEnabled
+          ? ''
+          : r.pendingDefinitions
+            ? ` (${r.pendingDefinitions} sample definition(s) — add an API key to auto-fill)`
+            : '';
+        // lightweight inline toast
+        const t = h('div.toast', `✅ Added ${r.deck.termCount} words to ${r.subject.icon} ${r.subject.name}${note}`);
+        document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
+      } catch (err) {
+        save.disabled = false; save.textContent = 'Save words';
+        status.textContent = 'Error: ' + err.message;
+      }
+    } }, 'Save words');
+
+    const body = h('div', [
+      h('label.author-label', 'Subject'), subjSelect, newSubjInput,
+      h('label.author-label', 'Word set name'), deckInput,
+      h('label.author-label', 'Vocabulary list'), wordsArea,
+      status, save,
+    ]);
+    const m = modal('➕ Add Words', body);
+    toggleNew();
   }
 
   (async () => {
