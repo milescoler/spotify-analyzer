@@ -2,6 +2,7 @@
 // public/ and a JSON API from /api/*. Run with: npm start  (or node server.js)
 import http from 'http';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as api from './lib/api.js';
@@ -128,7 +129,27 @@ const server = http.createServer(async (req, res) => {
   serveStatic(req, res, url.pathname);
 });
 
+// Collect this machine's LAN addresses so a phone on the same Wi-Fi can connect.
+function lanUrls() {
+  const urls = [];
+  for (const ifaces of Object.values(os.networkInterfaces())) {
+    for (const i of ifaces || []) {
+      if (i.family === 'IPv4' && !i.internal) urls.push(`http://${i.address}:${PORT}`);
+    }
+  }
+  return urls;
+}
+
 db.load(); // seed on boot
-server.listen(PORT, () => {
-  console.log(`🌱 Word Garden running at http://localhost:${PORT}`);
+// Bind to 0.0.0.0 so the server is reachable from other devices on the network,
+// not just this machine.
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n🌱 Word Garden is running!\n`);
+  console.log(`   On this computer:  http://localhost:${PORT}`);
+  const lan = lanUrls();
+  if (lan.length) {
+    console.log(`\n   📱 On your phone (same Wi-Fi), open:`);
+    for (const u of lan) console.log(`      ${u}`);
+  }
+  console.log('');
 });

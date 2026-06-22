@@ -54,6 +54,20 @@ npm test           # runs the learning/garden logic assertions
 npm run reset      # reset demo data to its starting state
 ```
 
+### 📱 On your phone
+
+`localhost` won't work from a phone — that points at the phone itself. Instead:
+
+- **Same Wi-Fi:** run `npm start` on a computer and open the **LAN URL the
+  server prints on startup** (e.g. `http://192.168.1.42:3000`) in your phone's
+  browser. The server binds to all interfaces, so no extra setup is needed —
+  just make sure the phone and computer are on the same network (and your
+  firewall allows port 3000).
+- **Anywhere / to share with a class:** deploy to any Node host. The app honors
+  `PORT` and binds `0.0.0.0`, so platforms like Render, Railway, or Fly.io work
+  out of the box (`npm start` as the start command). Note: the JSON-file store
+  is ephemeral on free tiers, so demo data resets on redeploy.
+
 ## How it's built
 
 A deliberately **zero-dependency** stack so it runs anywhere with just Node:
