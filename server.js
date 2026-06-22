@@ -75,6 +75,13 @@ async function handleApi(method, segments, query, body) {
     case method === 'POST' && head === 'decks':
       return api.createDeck(body); // async — handler awaits the returned promise
 
+    case method === 'POST' && head === 'scenario':
+      return api.scenario(body); // async
+    case method === 'POST' && head === 'interests':
+      return api.updateInterests(body);
+    case method === 'GET' && head === 'town':
+      return api.townState(query.classId);
+
     case method === 'GET' && head === 'gardens':
       return api.gardensList();
     case method === 'GET' && head === 'leaderboard':

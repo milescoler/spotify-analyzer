@@ -22,6 +22,15 @@ tree across every subject.
   are low-poly 3D models that grow with mastery, sway when healthy, droop when
   thirsty, and topple over grey when they die. Visiting a classmate's garden
   gives you a drag-to-orbit camera.
+- **🗺️ Adventure (personalized).** Pick your interests (space, dinosaurs,
+  soccer…) and the tool drops you into a short story themed to what you love —
+  set in your class town — that drills exactly the words you most need to
+  practice. Content is AI-generated (with an offline sample fallback).
+- **🏰 A shared class Town.** The class is a town everyone builds together:
+  every word any classmate masters adds to the town and unlocks shared
+  buildings (well → market → library → town hall…). Your own garden is your
+  **farm** within it; the Town tab shows the build progress and who's
+  contributing.
 - **Three ways to learn** the same deck: 🃏 flashcards, 📝 quizzes, and
   📖 fill-the-blank readings. A lightweight spaced-repetition model tracks
   mastery per word.

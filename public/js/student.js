@@ -3,6 +3,7 @@
 import { h, clear, api, toast, avatarEl, modal, catalog } from './util.js';
 import { renderGarden } from './garden.js';
 import { openTask } from './tasks.js';
+import { openAdventure } from './adventure.js';
 import { renderLeaderboard } from './shared.js';
 
 export function mountStudent(root, studentId, switchUser) {
@@ -13,9 +14,10 @@ export function mountStudent(root, studentId, switchUser) {
   let current = 'garden';
 
   const tabs = [
-    ['garden', '🌻 My Garden'],
+    ['garden', '🌻 My Farm'],
     ['learn', '📚 Learn'],
-    ['explore', '🧭 Visit Gardens'],
+    ['town', '🏰 Town'],
+    ['explore', '🧭 Visit Farms'],
     ['leaderboard', '🏆 Leaderboard'],
   ];
 
@@ -49,6 +51,7 @@ export function mountStudent(root, studentId, switchUser) {
     clear(content);
     if (tab === 'garden') return renderHome();
     if (tab === 'learn') return renderLearn();
+    if (tab === 'town') return renderTown();
     if (tab === 'explore') return renderExplore();
     if (tab === 'leaderboard') return renderLeaderboard(content, studentId, visitGarden);
   }
@@ -128,8 +131,30 @@ export function mountStudent(root, studentId, switchUser) {
 
   // ---- learn ----
   function renderLearn() {
-    const page = h('div.page', [h('h2', 'Learning Tasks'),
-      h('p.muted', 'Complete tasks from your teacher to grow your garden. Each subject is a skill tree.')]);
+    const page = h('div.page', [h('h2', 'Learning Tasks')]);
+
+    // Featured: personalized Adventure.
+    const s = home.student;
+    const interestChips = (s.interests || []).map((id) => {
+      const opt = (catalog.interests || []).find((x) => x.id === id);
+      return opt ? `${opt.emoji} ${opt.name}` : id;
+    });
+    page.appendChild(h('div.card.adventure-cta', [
+      h('div', { style: { flex: 1 } }, [
+        h('h3', { style: { margin: 0 } }, '🗺️ Adventure'),
+        h('p.muted', { style: { margin: '.3rem 0' } },
+          'Practice your words inside a story made just for you.'),
+        h('div.muted', { style: { fontSize: '.8rem' } }, [
+          'Themed to: ',
+          interestChips.length ? interestChips.join('  ·  ') : 'pick your interests →',
+          ' ',
+          h('button.linkbtn', { style: { color: 'var(--green-d)' }, onclick: openInterests }, '✏️ edit'),
+        ]),
+      ]),
+      h('button.btn.primary', { onclick: startAdventure }, 'Start ▶'),
+    ]));
+
+    page.appendChild(h('p.muted', 'Or practice a specific word set from your teacher:'));
     home.subjects.forEach((sub) => {
       const block = h('div.subject', [
         h('div.head', [
@@ -174,6 +199,85 @@ export function mountStudent(root, studentId, switchUser) {
       await refresh();
       go('garden');
     } });
+  }
+
+  async function startAdventure() {
+    clear(content);
+    await openAdventure(content, { studentId, onDone: async () => {
+      await refresh();
+      go('garden');
+    } });
+  }
+
+  // ---- interests editor (drives personalization) ----
+  function openInterests() {
+    const all = catalog.interests || [];
+    const chosen = new Set(home.student.interests || []);
+    const grid = h('div.opt-row', { style: { flexWrap: 'wrap' } });
+    all.forEach((opt) => {
+      const chip = h(`button.interest-chip${chosen.has(opt.id) ? '.sel' : ''}`, {
+        onclick: () => {
+          if (chosen.has(opt.id)) chosen.delete(opt.id);
+          else { if (chosen.size >= 4) { toast('Pick up to 4'); return; } chosen.add(opt.id); }
+          chip.classList.toggle('sel');
+        },
+      }, `${opt.emoji} ${opt.name}`);
+      grid.appendChild(chip);
+    });
+    const body = h('div', [
+      h('p.muted', 'Pick up to 4 things you love — your adventures will be set in them.'),
+      grid,
+      h('button.btn.primary', { onclick: async () => {
+        await api('interests', { body: { studentId, interests: [...chosen] } });
+        await refresh();
+        toast('Interests saved! ✨');
+        m.close();
+        if (current === 'learn') renderLearn();
+      } }, 'Save interests'),
+    ]);
+    const m = modal('✨ My Interests', body);
+  }
+
+  // ---- the shared class town ----
+  async function renderTown() {
+    const t = await api('town');
+    const page = h('div.page', [
+      h('h2', `🏰 ${t.name}`),
+      h('p.muted', `Your class builds this town together — every word everyone masters helps it grow. Town level ${t.level} · ${t.totalMastered} words mastered class-wide.`),
+    ]);
+
+    // Buildings strip.
+    page.appendChild(h('div.card', [
+      h('h3', 'Town Buildings'),
+      h('div.town-buildings', t.buildings.map((b) =>
+        h(`div.town-building${b.built ? '.built' : ''}`, { title: b.built ? b.name : `${b.name} — needs ${b.need} words` }, [
+          h('div.emoji', b.built ? b.emoji : '🚧'),
+          h('div.nm', b.name),
+          h('div.need', b.built ? 'Built!' : `${b.need} words`),
+        ]))),
+      t.next ? h('div', { style: { marginTop: '.6rem' } }, [
+        h('div.muted', { style: { fontSize: '.85rem' } },
+          `Next: ${t.next.emoji} ${t.next.name} — ${t.next.remaining} more word(s) to go!`),
+        h('div.progress-line', [h('i', { style: {
+          width: Math.round(100 * t.totalMastered / t.next.need) + '%' } })]),
+      ]) : h('p.muted', '🎉 Every building is complete — amazing teamwork!'),
+    ]));
+
+    // Contribution leaderboard.
+    page.appendChild(h('div.card', { style: { marginTop: '1rem' } }, [
+      h('h3', '🌾 Town Builders'),
+      ...t.contributions.map((c, i) => h('div.row', {
+        style: { alignItems: 'center', justifyContent: 'space-between',
+          padding: '.35rem 0', borderBottom: '1px solid var(--line)',
+          fontWeight: c.student.id === studentId ? '800' : '400' },
+      }, [
+        h('span', { style: { display: 'flex', alignItems: 'center', gap: '.5rem' } }, [
+          h('span', `${i + 1}.`), avatarEl(c.student.avatar, '1.4rem'),
+          c.student.name + (c.student.id === studentId ? ' (you)' : '')]),
+        h('span.pill.green', `${c.mastered} words`),
+      ])),
+    ]));
+    clear(content).appendChild(page);
   }
 
   // ---- explore other gardens ----
