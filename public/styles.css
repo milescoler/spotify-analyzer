@@ -84,40 +84,31 @@ a { color: var(--green-d); }
 .avatar .pet { position: absolute; bottom: -.1em; right: -.25em; font-size: .42em; }
 .avatar .ring { position: absolute; inset: -6%; border-radius: 50%; border: 3px solid var(--c, var(--green)); opacity: .8; }
 
-/* ---- garden ---- */
+/* ---- garden (isometric city-builder canvas) ---- */
 .garden-scene {
   position: relative; border-radius: var(--radius); overflow: hidden;
-  background: linear-gradient(var(--sky) 0%, var(--sky) 38%, #bfe39a 38%, #acd685 55%, #9ac56f 100%);
+  height: 460px;
+  background: linear-gradient(#bfe8ff 0%, #d6f0ff 30%, #cdeeb0 60%, #b6e08c 100%);
   box-shadow: var(--shadow); border: 1px solid var(--line);
 }
-.garden-deco-bar { position: absolute; top: 8px; right: 12px; font-size: 1.5rem; display: flex; gap: .25rem; }
-.plot-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
-  gap: .4rem; padding: 1rem; padding-top: 2.2rem;
+.garden-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  touch-action: none; cursor: grab; -webkit-tap-highlight-color: transparent;
 }
-.plot {
-  aspect-ratio: 1 / 1; border-radius: 12px;
-  background: radial-gradient(circle at 50% 80%, #b07a4e, #8a6240 70%);
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-  position: relative; cursor: pointer; border: 2px solid transparent; transition: .15s;
-  box-shadow: inset 0 -6px 10px rgba(0,0,0,.18);
+.garden-canvas:active { cursor: grabbing; }
+.garden-controls { position: absolute; bottom: 10px; right: 10px; display: flex; gap: .35rem; z-index: 2; }
+.garden-controls button {
+  width: 40px; height: 40px; border-radius: 11px; border: none;
+  background: rgba(255,255,255,.88); color: var(--ink); font-size: 1.3rem; font-weight: 800;
+  box-shadow: var(--shadow); line-height: 1;
 }
-.plot:hover { border-color: #fff; transform: translateY(-2px); }
-.plot.empty { background: repeating-linear-gradient(45deg,#9a6c45,#9a6c45 6px,#8a6240 6px,#8a6240 12px); opacity:.6; }
-.plot .plant-emoji { font-size: 2.1rem; line-height: 1; transition: transform .3s; filter: drop-shadow(0 2px 1px rgba(0,0,0,.2)); }
-.plot .plant-emoji.dead { filter: grayscale(1) brightness(.7); opacity:.55; }
-.plot .plant-emoji.wilting { filter: grayscale(.4); transform: rotate(-8deg); }
-.plot .label { font-size: .62rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); margin: 2px 2px 4px; text-align:center; }
-.plot .health-bar { position: absolute; top: 5px; left: 6px; right: 6px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.4); overflow: hidden; }
-.plot .health-bar > i { display:block; height: 100%; background: var(--green); transition: width .3s; }
-.plot .stage-dots { position: absolute; bottom: 3px; display: flex; gap: 2px; }
-.plot .stage-dots i { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.45); }
-.plot .stage-dots i.on { background: #fff; }
-.water-drop { position:absolute; top:4px; right:6px; font-size:.7rem; }
-
-/* growth bob animation for thriving plants */
-@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-.plot .plant-emoji.thriving { animation: bob 3.5s ease-in-out infinite; }
+.garden-controls button:hover { background: #fff; }
+.garden-hint {
+  position: absolute; bottom: 10px; left: 12px; z-index: 2;
+  font-size: .72rem; color: #2f4424; background: rgba(255,255,255,.72);
+  padding: .25rem .6rem; border-radius: 8px; pointer-events: none;
+}
+@media (max-width: 560px) { .garden-scene { height: 380px; } .garden-hint { display: none; } }
 
 /* ---- stat tiles ---- */
 .stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: .8rem; }

@@ -16,6 +16,10 @@ tree across every subject.
   better you know it, the more it grows (`seed → sprout → seedling → bud →
   bloom → flourishing`). Stop practicing and it gets thirsty, wilts, and
   eventually dies — water it by practicing again.
+- **Top-down isometric 3D world** rendered like a city builder: raised soil
+  tiles with depth and shadows, plants that sway when healthy and droop when
+  thirsty, and decorations placed around the land. Drag to pan, pinch/scroll to
+  zoom, tap a plant to inspect it.
 - **Three ways to learn** the same deck: 🃏 flashcards, 📝 quizzes, and
   📖 fill-the-blank readings. A lightweight spaced-repetition model tracks
   mastery per word.
@@ -117,7 +121,7 @@ public/
     student.js     Garden home, learn, explore, avatar studio
     teacher.js     Analytics dashboard
     tasks.js       Flashcard / quiz / reading runners
-    garden.js      Garden rendering
+    garden.js      Isometric 3D city-builder garden (Canvas2D renderer)
     shared.js      Leaderboard
     util.js        DOM + API helpers
 test/model.test.js
