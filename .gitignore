@@ -1,26 +1,15 @@
-# Virtual Environment
-venv/
-*.venv
-env/
-.env
+# Dependencies (the app ships with none, but keep this for tooling)
+node_modules/
 
-# Python bytecode
-__pycache__/
-*.py[cod]
-*$py.class
+# Runtime data — regenerated/seeded on first boot
+data/data.json
 
-# Streamlit cache
-.streamlit/
+# Logs & OS files
+*.log
+.DS_Store
 
-# IDE files
+# Editor
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Matplotlib
-*.png
-
-# Misc
-.DS_Store
-*.log

@@ -1,0 +1,16 @@
+{
+  "name": "word-garden",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Word Garden — a gamified vocabulary learning environment where students grow a garden by completing learning tasks, and teachers track skill trees across subjects.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "reset": "node -e \"import('./lib/db.js').then(m => { m.reset(); console.log('data reset'); })\"",
+    "test": "node test/model.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

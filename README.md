@@ -1,98 +1,87 @@
-# Spotify Playlist Analysis Tool
+# 🌱 Word Garden
 
-## Overview
-A charming name, I know. This tool is a powerful Streamlit application that provides comprehensive insights into your Spotify playlists. The application visualizes track popularity, artist distribution, and playlist metrics in an elegant, interactive interface.
+A gamified **vocabulary learning environment** where students grow a living
+garden by completing learning tasks. Words bloom into plants with practice and
+**wilt and die without it** — turning spaced repetition into something you can
+see and care for. Teachers get analytics dashboards of each student's skill
+tree across every subject.
 
-## Features
-- Authenticate securely with your Spotify account
-- Analyze any accessible Spotify playlist (public, private, or collaborative)
-- Visualize popularity distribution across tracks
-- Identify top artists and their representation
-- View detailed track information including album and popularity scores
-- Export complete playlist data as CSV for further analysis
-- Clean, responsive interface optimized for desktop and mobile
+> Centered on vocabulary, but the task framework (flashcards, quizzes,
+> readings) works for any curriculum a teacher brings.
 
-## Prerequisites
-- Python 3.8+
-- Spotify Developer Account
-- Modern web browser
+## What it does
 
-## Installation
+### For students
+- **Grow a garden.** Every word you practice is auto-planted as a plant. The
+  better you know it, the more it grows (`seed → sprout → seedling → bud →
+  bloom → flourishing`). Stop practicing and it gets thirsty, wilts, and
+  eventually dies — water it by practicing again.
+- **Three ways to learn** the same deck: 🃏 flashcards, 📝 quizzes, and
+  📖 fill-the-blank readings. A lightweight spaced-repetition model tracks
+  mastery per word.
+- **Unlock objects** as you level up: new plant species (sunflowers, roses,
+  lotus…) and garden decorations (koi pond, gnome, lantern…) earned through
+  milestones and streaks.
+- **Customize an avatar** — face, hat, pet, and color, with fancier options
+  unlocking as you level up.
+- **Visit classmates' gardens**, leave cheers, and **compete** on the garden
+  leaderboard (scored on healthy, thriving, diverse plants + decorations).
 
-### 1. Clone the Repository
+### For teachers
+- **Cross-subject skill-tree dashboard.** A per-student heatmap of mastery
+  across every subject and deck (built for elementary teachers who teach
+  reading, science, and math vocabulary to the same class).
+- **Class rollups**: average mastery per subject, and a **"needs attention"**
+  list flagging inactive students or decaying skills (⚠) that haven't been
+  practiced.
+- Click any student for a detailed per-skill breakdown.
+
+## Run it
+
+No dependencies, no build step — just Node 18+:
+
 ```bash
-git clone https://github.com/milescoler/spotify-analyzer.git
-cd spotify-analyzer
+npm start          # serves http://localhost:3000
 ```
 
-### 2. Create Virtual Environment
+Open the page and pick a student (Maya, Liam, Aisha, Noah, Sofia) or the
+teacher (Ms. Rivera) from the sign-in screen. The demo seeds a 3rd-grade class
+with varied practice history, so you'll immediately see thriving gardens,
+wilting plants, and a populated teacher dashboard.
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+npm test           # runs the learning/garden logic assertions
+npm run reset      # reset demo data to its starting state
 ```
 
-### 3. Run Setup Script
-```bash
-python setup.py
+## How it's built
+
+A deliberately **zero-dependency** stack so it runs anywhere with just Node:
+
+```
+server.js          Built-in http server: static files + JSON API
+lib/
+  model.js         Pure logic: spaced repetition, plant growth/decay,
+                   leveling, unlocks, garden scoring, avatars
+  api.js           Endpoint logic (transport-agnostic, returns plain JSON)
+  db.js            Tiny JSON-file store (data/data.json)
+  seed.js          Deterministic demo class + practice history
+public/
+  index.html, styles.css
+  js/
+    app.js         Sign-in + routing
+    student.js     Garden home, learn, explore, avatar studio
+    teacher.js     Analytics dashboard
+    tasks.js       Flashcard / quiz / reading runners
+    garden.js      Garden rendering
+    shared.js      Leaderboard
+    util.js        DOM + API helpers
+test/model.test.js
 ```
 
-This will:
-- Create a .streamlit/secrets.toml template
-- Install all required dependencies
-
-### 4. Configure Spotify API Credentials
-1. Visit the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
-2. Create a new application
-3. Set a Redirect URI to `http://localhost:8501`
-4. Update the `.streamlit/secrets.toml` file with your credentials:
-```toml
-SPOTIPY_CLIENT_ID = "your_client_id_here"
-SPOTIPY_CLIENT_SECRET = "your_client_secret_here"
-SPOTIPY_REDIRECT_URI = "http://localhost:8501"
-```
-
-## Running the Application
-```bash
-streamlit run app.py
-```
-
-The application will open in your default web browser at `http://localhost:8501`.
-
-## Usage Guide
-1. Enter a Spotify playlist URL or ID in the input field
-2. For first-time use, you'll need to authenticate with your Spotify account
-3. The application will display:
-   - Playlist metadata (name, owner, track count)
-   - Popularity distribution chart
-   - Top artists visualization
-   - Complete track listing with details
-4. Use the "Download as CSV" button to export the data
-
-## Technical Details
-This application leverages:
-- Streamlit for the web interface
-- Spotipy library for Spotify API integration
-- Pandas for data manipulation
-- Matplotlib and Seaborn for data visualization
-
-## Security Notes
-- The application uses OAuth 2.0 for secure authentication
-- Your Spotify credentials are never stored by the application
-- API keys should be kept confidential and not committed to version control
-
-## Contributing
-Contributions are welcome! To contribute:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Acknowledgments
-- Spotify for providing their comprehensive Web API
-- Streamlit team for their excellent data application framework
-- The open-source community for their invaluable libraries
-
-## Disclaimer
-This project is not affiliated with, endorsed by, or connected to Spotify in any way. It is an independent tool that uses Spotify's publicly available API.
+### The growth/decay model
+Each review updates a word's `mastery` (rises on correct answers, drops on
+misses) and stamps `lastPracticed`. A plant's **health** decays exponentially
+from its mastery the longer it goes unpracticed — well-learned words decay
+slower. Health drives the plant's on-screen condition (thriving → thirsty →
+wilting → dead) and the garden's leaderboard score. See `lib/model.js`.
